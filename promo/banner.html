@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clinical Stats Navigator banner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  :root {
+    --bg: #123c46; --bg2: #0d2e36; --ink: #f2f7f5; --muted: #a9c4c6; --accent: #7fc3cf;
+    --card: #ffffff; --card-ink: #17211e; --card-muted: #56645f; --line: #d8dfdb; --paper: #f5f7f5;
+    --ok: #2d7a4d; --bad: #ac3636; --warn: #9a5f12; --soft: #e2eef0;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { background: var(--bg); }
+  body { font-family: "Public Sans", Helvetica, Arial, sans-serif; color: var(--ink); overflow: hidden; }
+  .frame {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(127,195,207,0.18), transparent 45%),
+      linear-gradient(160deg, var(--bg) 0%, var(--bg2) 100%);
+  }
+  /* faint graph-paper texture */
+  .frame::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .mark { width: 44px; height: 44px; border-radius: 8px; background: var(--accent); color: var(--bg2); display: grid; place-items: center; flex: none; }
+  .eyebrow { font-size: 15px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: "Spectral", Georgia, serif; font-weight: 600; line-height: 1.02; letter-spacing: -0.01em; }
+  .sub { color: #d9e7e6; line-height: 1.4; }
+  .feats { list-style: none; padding: 0; display: flex; flex-direction: column; }
+  .feats li { display: flex; gap: 12px; align-items: baseline; }
+  .feats b { color: var(--ink); font-weight: 600; }
+  .feats span.t { color: var(--muted); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex: none; transform: translateY(-2px); }
+  .url {
+    display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
+    background: var(--ink); color: var(--bg2); border-radius: 999px; font-weight: 700;
+  }
+  .url svg { flex: none; }
+  .credit { color: var(--muted); }
+  .credit b { color: var(--ink); font-weight: 600; }
+
+  /* mock app window */
+  .app { background: var(--paper); color: var(--card-ink); border-radius: 12px; box-shadow: 0 24px 60px rgba(0,0,0,0.35); overflow: hidden; }
+  .app-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--card); border-bottom: 1px solid var(--line); font-family: "Spectral", serif; font-weight: 600; font-size: 14px; }
+  .app-bar i { width: 18px; height: 18px; border-radius: 4px; background: #1c5a68; display: inline-block; }
+  .app-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .q { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+  .q small { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--card-muted); }
+  .q h3 { font-family: "Spectral", serif; font-weight: 600; font-size: 18px; line-height: 1.25; margin: 2px 0 10px; }
+  .opt { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 13px; font-weight: 600; margin-top: 6px; background: var(--paper); }
+  .opt.sel { border-color: #1c5a68; background: var(--soft); }
+  .opt em { display: block; font-style: normal; font-weight: 400; font-size: 11.5px; color: var(--card-muted); }
+  .chk { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 6px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+  .chk .m { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 11px; flex: none; }
+  .chk.ok { border-left-color: var(--ok); } .chk.ok .m { background: var(--ok); }
+  .chk.bad { border-left-color: var(--bad); } .chk.bad .m { background: var(--bad); }
+  .chk.warn { border-left-color: var(--warn); } .chk.warn .m { background: var(--warn); }
+  .chk .alt { margin-left: auto; font-size: 11.5px; font-weight: 600; color: #1c5a68; white-space: nowrap; }
+  .label { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--card-muted); }
+
+  /* ---------- Landscape 1200 x 630 ---------- */
+  body.landscape .frame { width: 1200px; height: 630px; padding: 48px 56px; display: grid; grid-template-columns: 1fr 440px; gap: 48px; }
+  body.landscape .left { position: relative; display: flex; flex-direction: column; gap: 18px; }
+  body.landscape h1 { font-size: 66px; }
+  body.landscape .sub { font-size: 21px; max-width: 30ch; }
+  body.landscape .feats { gap: 8px; font-size: 17px; }
+  body.landscape .url { font-size: 17px; padding: 10px 18px; margin-top: 4px; }
+  body.landscape .credit { font-size: 14px; margin-top: auto; }
+  body.landscape .right { position: relative; align-self: center; }
+
+  /* ---------- Square 1080 x 1080 ---------- */
+  body.square .frame { width: 1080px; height: 1080px; padding: 64px; display: flex; flex-direction: column; gap: 22px; }
+  body.square h1 { font-size: 84px; }
+  body.square .sub { font-size: 25px; max-width: 34ch; }
+  body.square .row { display: grid; grid-template-columns: 1fr 420px; gap: 40px; align-items: start; margin-top: 10px; }
+  body.square .feats { gap: 14px; font-size: 20px; }
+  body.square .feats li { flex-direction: column; gap: 2px; padding-left: 21px; position: relative; }
+  body.square .feats .dot { position: absolute; left: 0; top: 10px; transform: none; }
+  body.square .url { font-size: 21px; padding: 13px 22px; margin-top: auto; }
+  body.square .credit { font-size: 16px; }
+  body.square .eyebrow { font-size: 17px; }
+</style>
+</head>
+<body>
+<div class="frame" id="frame"></div>
+
+<template id="t-brand">
+  <div class="brand">
+    <span class="mark"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M3 20 L8 9 L12 14 L16 5 L21 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
+    <span class="eyebrow">Free web app for clinicians</span>
+  </div>
+</template>
+
+<template id="t-feats">
+  <ul class="feats">
+    <li><i class="dot"></i><b>Guided test finder</b> <span class="t">plain-language questions lead to the right test</span></li>
+    <li><i class="dot"></i><b>Assumption checklists</b> <span class="t">how to check each one, and what to do if it fails</span></li>
+    <li><i class="dot"></i><b>Pitfalls, interpretation &amp; reporting</b> <span class="t">with R, SPSS and jamovi commands</span></li>
+    <li><i class="dot"></i><b>36 tests</b> <span class="t">ANOVA to survival, regression, Bayesian and estimation</span></li>
+  </ul>
+</template>
+
+<template id="t-url">
+  <span class="url"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg>rasan17.github.io/clinical-stats-navigator</span>
+</template>
+
+<template id="t-credit">
+  <p class="credit">Conceived, directed and tested by <b>Dr G Narenthiran</b> BSc(MedSci) MB ChB MRCS(Ed.) FEBNS FRCS(SN)</p>
+</template>
+
+<template id="t-app">
+  <div class="app">
+    <div class="app-bar"><i></i>Clinical Stats Navigator</div>
+    <div class="app-body">
+      <div class="q">
+        <small>Question 2</small>
+        <h3>Was each patient measured more than once?</h3>
+        <div class="opt">No, each group contains different patients</div>
+        <div class="opt sel">Yes, at two time points<em>before and after, or matched pairs</em></div>
+      </div>
+      <p class="label">Assumptions checklist · Paired t-test</p>
+      <div class="chk ok"><span class="m">✓</span>Measurements are genuinely paired</div>
+      <div class="chk ok"><span class="m">✓</span>Pairs are independent</div>
+      <div class="chk bad"><span class="m">✕</span>Differences roughly normal<span class="alt">Use Wilcoxon →</span></div>
+    </div>
+  </div>
+</template>
+
+<script>
+  const layout = location.hash === "#square" ? "square" : "landscape";
+  document.body.className = layout;
+  const t = (id) => document.getElementById(id).innerHTML;
+  const title = `<h1>Clinical Stats<br>Navigator</h1>`;
+  const sub = `<p class="sub">Choose the right statistical test, check its assumptions, and interpret the results with confidence.</p>`;
+  document.getElementById("frame").innerHTML = layout === "landscape"
+    ? `<div class="left">${t("t-brand")}${title}${sub}${t("t-feats")}${t("t-url")}${t("t-credit")}</div><div class="right">${t("t-app")}</div>`
+    : `${t("t-brand")}${title}${sub}<div class="row">${t("t-feats")}${t("t-app")}</div>${t("t-url")}${t("t-credit")}`;
+</script>
+</body>
+</html>
