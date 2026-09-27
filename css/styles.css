@@ -225,6 +225,38 @@ h1, h2, h3 { text-wrap: balance; }
 .facts dt { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .facts dd { margin: 0; font-size: 0.95rem; }
 
+/* Calculate it: links to the web apps */
+.calc { margin-top: 20px; padding: 18px 20px; border: 1px solid var(--accent); border-radius: 10px; background: var(--accent-soft); }
+.calc h2 { margin: 0 0 4px; font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; }
+.calc-note { margin: 0 0 12px; font-size: 0.92rem; color: var(--muted); max-width: 66ch; }
+.calc-none { border-color: var(--line); background: var(--surface); }
+.calc-none .calc-note { margin-bottom: 0; }
+.calc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.calc-item {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  grid-template-areas: "btn where" "btn how";
+  gap: 2px 16px;
+  align-items: start;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.calc-btn {
+  grid-area: btn;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 12px;
+  border-radius: var(--r);
+  background: var(--accent); color: var(--accent-ink);
+  font-weight: 600; font-size: 0.92rem; text-decoration: none; text-align: center;
+}
+.calc-btn:hover { filter: brightness(1.08); }
+.calc-where { grid-area: where; font-size: 0.95rem; }
+.calc-where .lbl { display: inline; margin-right: 6px; }
+.calc-how { grid-area: how; margin: 0; font-size: 0.9rem; color: var(--muted); }
+.linklike { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; font: inherit; }
+
 .jump {
   position: sticky;
   top: calc(env(safe-area-inset-top, 0px) + 59px);
@@ -388,6 +420,9 @@ h1, h2, h3 { text-wrap: balance; }
   .qcard h2 { font-size: 1.4rem; }
   .test-head h1 { font-size: 1.8rem; }
   .facts { grid-template-columns: 1fr; }
+  .calc { padding: 16px 14px; }
+  .calc-item { grid-template-columns: minmax(0, 1fr); grid-template-areas: "where" "how" "btn"; gap: 6px; }
+  .calc-btn { justify-self: start; margin-top: 4px; }
   .facts > div + div { border-left: 0; border-top: 1px solid var(--line); }
   .trail-btn { grid-template-columns: 1fr; }
   .trail-a { text-align: left; }

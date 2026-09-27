@@ -130,6 +130,25 @@
     const related = (t.related || []).filter((r) => TESTS[r]).map((r) =>
       `<a class="chip" href="#${r}">${esc(TESTS[r].name)}</a>`).join("");
 
+    const links = (window.APP_LINKS || {})[id] || [];
+    const calc = links.length ? `
+        <section class="calc" aria-labelledby="calc-h">
+          <h2 id="calc-h">Calculate it</h2>
+          <p class="calc-note">Check the assumptions below, then run the test in ${links.length > 1 ? "either of these web apps" : "this web app"}. Each link opens in a new tab.</p>
+          <ul class="calc-list">${links.map((l) => {
+            const a = window.APPS[l.app];
+            return `<li class="calc-item">
+              <a class="calc-btn" href="${a.url}" target="_blank" rel="noopener">Open ${esc(a.name)} <span aria-hidden="true">↗</span></a>
+              <div class="calc-where"><span class="lbl">Go to</span><strong>${esc(l.where)}</strong></div>
+              <p class="calc-how">${esc(l.how)}</p>
+            </li>`;
+          }).join("")}</ul>
+        </section>` : `
+        <section class="calc calc-none" aria-labelledby="calc-h">
+          <h2 id="calc-h">Calculate it</h2>
+          <p class="calc-note">This test is not yet available in Statis, Statis Gravity or Bayesian Estimation. Use one of the statistical packages listed under <button type="button" class="linklike" data-jump="sec-software">Run it in software</button>.</p>
+        </section>`;
+
     main.innerHTML = `
       <article class="test">
         <header class="test-head">
@@ -141,6 +160,7 @@
             <div><dt>Clinical example</dt><dd>${esc(t.example)}</dd></div>
           </dl>
         </header>
+${calc}
 
         <nav class="jump" aria-label="Sections">
           ${[["why", "Why this test"], ["assumptions", "Assumptions"], ["pitfalls", "Pitfalls"], ["interpret", "Interpreting"], ["report", "Reporting"], ["software", "Software"]]
@@ -191,7 +211,6 @@
         <section id="sec-software" class="sec">
           <h2>Run it in software</h2>
           <dl class="sw">${t.software.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd><pre><code>${esc(v)}</code></pre></dd></div>`).join("")}</dl>
-          <p class="sec-note sw-apps">You can perform these statistical analyses using <strong><a href="https://rasan17.github.io/Statis-28/" target="_blank" rel="noopener">Statis</a>, <a href="https://rasan17.github.io/statis-gravity/" target="_blank" rel="noopener">Statis Gravity</a>, and <a href="https://rasan17.github.io/Bayes-Estimation/" target="_blank" rel="noopener">Bayesian Estimation</a></strong>, web applications conceived, directed, and rigorously tested by Dr G Narenthiran, before undertaking the tests in professional statistical software.</p>
         </section>
 
         ${related ? `<section class="sec"><h2>Related tests</h2><div class="chips">${related}</div></section>` : ""}
