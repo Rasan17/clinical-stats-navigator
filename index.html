@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="A guided decision aid that helps clinicians choose the right statistical test, check its assumptions, avoid pitfalls, and interpret and report results.">
+<title>Clinical Stats Navigator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <a href="#start" id="home-link" class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 20 L8 9 L12 14 L16 5 L21 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    </span>
+    <span class="brand-name">Clinical Stats Navigator</span>
+  </a>
+  <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="sidebar">All tests</button>
+</header>
+
+<section class="credits" aria-label="Attribution and disclaimer">
+  <div class="credits-inner">
+    <p class="credit-line"><span class="credit-lbl">Conceived, Directed and Tested:</span> Dr G Narenthiran BSc(MedSci) MB ChB MRCS(Ed.) FEBNS FRCS(SN), <span class="email">g_narenthiran@hotmail.com</span></p>
+    <p class="credit-line">Copyright © G Narenthiran, <span class="email">g_narenthiran@hotmail.com</span>. All rights reserved.</p>
+    <p class="notice"><strong>Disclaimer:</strong> Clinical Stats Navigator is a general guide; please double-check the advice with statistical texts.</p>
+    <p class="apps">You can perform these statistical analyses using <strong><a href="https://rasan17.github.io/Statis-28/" target="_blank" rel="noopener">Statis</a>, <a href="https://rasan17.github.io/statis-gravity/" target="_blank" rel="noopener">Statis Gravity</a>, and <a href="https://rasan17.github.io/Bayes-Estimation/" target="_blank" rel="noopener">Bayesian Estimation</a></strong>, web applications conceived, directed, and rigorously tested by Dr G Narenthiran, before undertaking the tests in professional statistical software.</p>
+  </div>
+</section>
+
+<div class="layout">
+  <aside id="sidebar" class="sidebar">
+    <label for="search" class="search-label">Search tests</label>
+    <input id="search" type="search" placeholder="e.g. survival, proportion, ANOVA" autocomplete="off">
+    <nav id="catalogue" class="catalogue" aria-label="All tests"></nav>
+  </aside>
+  <main id="main" class="main" tabindex="-1"></main>
+</div>
+
+<footer class="site-foot">
+  <div class="credits-inner">
+    <p class="credit-line"><span class="credit-lbl">Conceived, Directed and Tested:</span> Dr G Narenthiran BSc(MedSci) MB ChB MRCS(Ed.) FEBNS FRCS(SN), <span class="email">g_narenthiran@hotmail.com</span></p>
+    <p class="credit-line">Copyright © G Narenthiran, <span class="email">g_narenthiran@hotmail.com</span>. All rights reserved.</p>
+    <p class="apps">You can perform these statistical analyses using <strong><a href="https://rasan17.github.io/Statis-28/" target="_blank" rel="noopener">Statis</a>, <a href="https://rasan17.github.io/statis-gravity/" target="_blank" rel="noopener">Statis Gravity</a>, and <a href="https://rasan17.github.io/Bayes-Estimation/" target="_blank" rel="noopener">Bayesian Estimation</a></strong>, web applications conceived, directed, and rigorously tested by Dr G Narenthiran, before undertaking the tests in professional statistical software.</p>
+  </div>
+</footer>
+
+<script src="js/tree.js"></script>
+<script src="js/tests.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
