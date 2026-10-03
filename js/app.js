@@ -47,7 +47,7 @@
         </header>
         ${trail ? `<ol class="trail" aria-label="Your answers so far">${trail}</ol>` : ""}
         <div class="qcard">
-          <p class="step">Question ${step}</p>
+          ${stepper(step)}
           <h2 id="wiz-q">${esc(node.q)}</h2>
           ${node.help ? `<p class="qhelp">${esc(node.help)}</p>` : ""}
           <div class="options">
@@ -68,6 +68,22 @@
     const back = $("#wiz-back"); if (back) back.addEventListener("click", () => goBack(wiz.history.length - 1));
     const reset = $("#wiz-reset"); if (reset) reset.addEventListener("click", resetWizard);
     const first = main.querySelector(".opt"); if (first && wiz.history.length) first.focus({ preventScroll: true });
+  }
+
+  // Longest possible number of questions from a node to a result, counting the framework question.
+  function depth(nodeId) {
+    return 1 + Math.max(...TREE[nodeId].options.map((o) => o.next ? depth(o.next) : o.fw ? depth("fw_" + o.fw) : 0));
+  }
+
+  function stepper(step) {
+    const total = step - 1 + depth(wiz.node);
+    const dots = Array.from({ length: total }, (_, i) =>
+      `<span class="pip ${i < step - 1 ? "done" : i === step - 1 ? "now" : "todo"}"></span>`).join("");
+    const more = total - step;
+    return `<div class="stepper" aria-label="Question ${step}${more ? `, up to ${more} more` : ", last question"}">
+        <div class="pips" aria-hidden="true">${dots}</div>
+        <p class="step">Question ${step}${more ? ` · up to ${more} more` : " · last question"}</p>
+      </div>`;
   }
 
   function choose(i) {
@@ -146,7 +162,7 @@
         </section>` : `
         <section class="calc calc-none" aria-labelledby="calc-h">
           <h2 id="calc-h">Calculate it</h2>
-          <p class="calc-note">This test is not yet available in Statis, Statis Gravity or Bayesian Estimation. Use one of the statistical packages listed under <button type="button" class="linklike" data-jump="sec-software">Run it in software</button>.</p>
+          <p class="calc-note">This test is not yet available in Statis, Statis Gravity or Bayesian Estimation. Run it in a general statistics package instead: <strong>R</strong> (free), <strong>jamovi</strong> or <strong>JASP</strong> (free, point-and-click), <strong>SPSS</strong>, <strong>Stata</strong>, or <strong>Python</strong> (statsmodels, scipy, lifelines). The commands are under <button type="button" class="linklike" data-jump="sec-software">Run it in software</button>.</p>
         </section>`;
 
     main.innerHTML = `
@@ -192,26 +208,26 @@ ${calc}
           </details>
         </section>
 
-        <section id="sec-pitfalls" class="sec">
-          <h2>Pitfalls to avoid</h2>
+        <details id="sec-pitfalls" class="sec sec-d" open>
+          <summary><h2>Pitfalls to avoid</h2></summary>
           <ul class="pitfalls">${t.pitfalls.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
-        </section>
+        </details>
 
-        <section id="sec-interpret" class="sec">
-          <h2>Interpreting the results</h2>
+        <details id="sec-interpret" class="sec sec-d" open>
+          <summary><h2>Interpreting the results</h2></summary>
           <ol class="steps">${t.interpret.map((p) => `<li>${esc(p)}</li>`).join("")}</ol>
-        </section>
+        </details>
 
-        <section id="sec-report" class="sec">
-          <h2>How to report it</h2>
+        <details id="sec-report" class="sec sec-d" open>
+          <summary><h2>How to report it</h2></summary>
           <p class="sec-note">An example sentence for a results section. The numbers are illustrative; replace them with your own.</p>
           <blockquote class="report">${esc(t.report)}</blockquote>
-        </section>
+        </details>
 
-        <section id="sec-software" class="sec">
-          <h2>Run it in software</h2>
+        <details id="sec-software" class="sec sec-d" open>
+          <summary><h2>Run it in software</h2></summary>
           <dl class="sw">${t.software.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd><pre><code>${esc(v)}</code></pre></dd></div>`).join("")}</dl>
-        </section>
+        </details>
 
         ${related ? `<section class="sec"><h2>Related tests</h2><div class="chips">${related}</div></section>` : ""}
 
@@ -239,6 +255,7 @@ ${calc}
 
     main.querySelectorAll("[data-jump]").forEach((b) => b.addEventListener("click", () => {
       const el = document.getElementById(b.dataset.jump);
+      if (el && el.tagName === "DETAILS") el.open = true;
       if (el) el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     }));
 
@@ -289,8 +306,8 @@ ${calc}
   // ---------- Routing ----------
   function route() {
     const id = location.hash.slice(1);
-    if (TESTS[id]) { renderTest(id); document.title = TESTS[id].name + " · Clinical Stats Navigator"; }
-    else { renderWizard(); document.title = "Clinical Stats Navigator"; }
+    if (TESTS[id]) { renderTest(id); document.title = TESTS[id].name + " · Statis Clinical Stats Navigator"; }
+    else { renderWizard(); document.title = "Statis Clinical Stats Navigator"; }
     renderCatalogue($("#search").value);
     window.scrollTo({ top: 0 });
     document.body.classList.remove("nav-open");

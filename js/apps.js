@@ -3,7 +3,7 @@
 // Tests with no entry (or an empty list) are not yet available in any of the apps.
 
 window.APPS = {
-  statis: { name: "Statis", url: "https://rasan17.github.io/Statis-28/" },
+  statis: { name: "Statis", url: "https://rasan17.github.io/Statis/" },
   gravity: { name: "Statis Gravity", url: "https://rasan17.github.io/statis-gravity/" },
   bayes: { name: "Bayesian Estimation", url: "https://rasan17.github.io/Bayes-Estimation/" }
 };
@@ -36,6 +36,22 @@ window.APP_LINKS = {
   "rm-anova": [
     { app: "gravity", where: "Multi-Group ANOVA", how: "Tick “Paired / Repeated Measures Design” and choose One-Way Repeated Measures ANOVA (sphericity is assessed), or the Friedman test for skewed data. Every patient needs a value at every time point; for missing visits use a mixed model in R or SPSS." }
   ],
+  "manova": [
+    { app: "statis", where: "MANOVA/ANCOVA tab", how: "Choose MANOVA, enter the group labels and add two or more dependent variables. Gives Wilks’ Λ with follow-up univariate ANOVAs. It does not report Pillai’s trace, which is preferred when group sizes or covariance matrices differ; check that in R or SPSS if this applies." }
+  ],
+  "ancova": [
+    { app: "statis", where: "MANOVA/ANCOVA tab", how: "Choose ANCOVA, enter the outcome and group labels and add one or more covariates (e.g. the baseline value). Gives adjusted group means with 95% CIs, partial η² and a homogeneity-of-slopes check." }
+  ],
+  "diag-accuracy": [
+    { app: "gravity", where: "2x2 Risk & Contingency", how: "Choose “Diagnostic Test vs Gold Standard” and enter the four counts. Gives sensitivity, specificity, PPV, NPV and overall accuracy." },
+    { app: "bayes", where: "Diagnostic Bayes & Nomogram tab", how: "Enter sensitivity, specificity and prevalence to get likelihood ratios, the diagnostic odds ratio and post-test probabilities." }
+  ],
+  "roc": [
+    { app: "gravity", where: "Diagnostic & ROC", how: "Paste the marker values with each patient’s outcome and choose “Generate ROC & Cutoff”. Gives the ROC curve, AUC and the Youden-optimal cut-off." }
+  ],
+  "post-test": [
+    { app: "bayes", where: "Diagnostic Bayes & Nomogram tab", how: "Enter the pre-test probability, sensitivity and specificity. Gives LR+, LR−, post-test probabilities after a positive and a negative result (with 95% HDI) and a Fagan nomogram." }
+  ],
   "chi-2x2": [
     { app: "statis", where: "Contingency table tab", how: "Enter the four counts. Gives χ² (with optional Yates’ correction), Fisher’s exact test, odds ratio and relative risk with 95% CIs." },
     { app: "gravity", where: "2x2 Risk & Contingency", how: "Choose “Clinical Study / Trial”. Gives χ², Fisher’s exact test, relative risk, odds ratio, risk reduction and NNT." }
@@ -45,7 +61,7 @@ window.APP_LINKS = {
     { app: "gravity", where: "2x2 Risk & Contingency", how: "Choose “Clinical Study / Trial”; Fisher’s exact test is reported with the risk measures." }
   ],
   "chi-rxc": [
-    { app: "statis", where: "Pivot tab", how: "Upload or paste patient-level data (one row per patient), then choose the row and column variables. Gives χ² and Cramér’s V, and switches automatically to the Fisher–Freeman–Halton exact test when expected counts are too small." }
+    { app: "statis", where: "Descriptive/Pivot tab", how: "Upload or paste patient-level data (one row per patient), then choose the row and column variables. Gives χ² and Cramér’s V, and switches automatically to the Fisher–Freeman–Halton exact test when expected counts are too small." }
   ],
   "pearson": [
     { app: "statis", where: "Correlation tab", how: "Paste X and Y in matching order. Includes normality and curvature checks; choose Pearson or leave on Auto." },
@@ -66,10 +82,10 @@ window.APP_LINKS = {
     { app: "statis", where: "Survival tab", how: "Choose “Two-group comparison” and add the group column. Gives both Kaplan–Meier curves, medians and the log-rank test. For the hazard ratio, use a Cox model in R or SPSS." }
   ],
   "logistic": [
-    { app: "statis", where: "GLM tab", how: "Choose Logistic regression, enter the 0/1 outcome and add one or more predictors (continuous, ordinal or nominal). Gives odds ratios with 95% CIs, pseudo-R² and a classification table." }
+    { app: "statis", where: "GLM tab", how: "Choose Logistic regression (logit link), enter the 0/1 outcome and add one or more predictors (continuous, ordinal or nominal). Gives odds ratios with 95% CIs, pseudo-R² and a classification table; Firth’s correction switches on automatically when there are fewer than 10 events per predictor." }
   ],
   "poisson-binary": [
-    { app: "statis", where: "GLM tab", how: "Choose “Poisson regression for binary outcomes”. Gives risk ratios with robust standard errors." }
+    { app: "statis", where: "GLM tab", how: "Choose “Relative risk regression for binary outcomes”. It fits log-binomial regression first and falls back to modified Poisson with robust standard errors if that does not converge; a percentile bootstrap is offered for small samples." }
   ],
   "poisson-count": [
     { app: "statis", where: "GLM tab", how: "Choose Poisson regression. It has no follow-up-time offset or negative binomial model, so if follow-up varies between patients or the data are overdispersed, use R or SPSS." }

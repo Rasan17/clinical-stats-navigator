@@ -8,6 +8,7 @@ window.FAMILIES = [
   { id: "corr", label: "Correlation and linear regression" },
   { id: "surv", label: "Survival analysis" },
   { id: "binary", label: "Logistic and Poisson regression" },
+  { id: "diagnostic", label: "Diagnostic accuracy" },
   { id: "explore", label: "Data exploration" },
   { id: "bayes", label: "Bayesian methods" },
   { id: "estimation", label: "Estimation statistics" },
@@ -1056,6 +1057,116 @@ window.TESTS = {
       ["Python", "prince.FAMD(n_components = 5).fit(df)"]
     ],
     related: ["pca", "mca"]
+  },
+
+  // =================== DIAGNOSTIC ACCURACY ===================
+  "diag-accuracy": {
+    name: "Diagnostic accuracy: sensitivity, specificity and predictive values",
+    family: "diagnostic",
+    short: "Measures how well a positive/negative test agrees with a reference (gold) standard.",
+    useWhen: "A yes/no index test and a reference standard performed on the same patients.",
+    example: "CT angiography vs digital subtraction angiography (reference standard) for detecting intracranial aneurysms in 212 patients with subarachnoid haemorrhage.",
+    why: "Cross-tabulating the index test against the reference standard gives a 2×2 table of true and false positives and negatives. From it come sensitivity and specificity (properties of the test), predictive values (which depend on how common the disease is), and likelihood ratios (which convert a pre-test probability into a post-test probability).",
+    assumptions: [
+      { t: "The reference standard is the best available and correctly classifies the condition", how: "Check that the reference standard is accepted in your field. An imperfect reference standard biases accuracy estimates.", fail: "Acknowledge the limitation; consider a composite reference standard or latent class analysis with a statistician." },
+      { t: "Every patient (or a random sample) received the reference standard", how: "If only test-positive patients were verified, sensitivity is overestimated (partial verification bias).", fail: "Report the bias, or apply a verification-bias correction (Begg–Greenes) with a statistician." },
+      { t: "The patients resemble those in whom the test will be used", how: "Consecutive or random patients with suspected disease. Comparing severe cases with healthy volunteers (a case–control design) inflates accuracy (spectrum bias).", fail: "State the limitation clearly; accuracy may be lower in practice." },
+      { t: "Index test and reference standard were interpreted blind to each other", how: "Readers of one test should not know the result of the other.", fail: "Report the risk of review bias; blinded re-reading is best." },
+      { t: "The positivity threshold was set in advance", how: "For a test with a numeric result, the cut-off should be pre-specified.", fail: "If the cut-off was chosen from the data, label it exploratory and validate it in new patients.", alt: "roc" },
+      { t: "Indeterminate or uninterpretable results are reported", how: "Count results that were neither positive nor negative.", fail: "Report them and show how accuracy changes if they are counted as positive or as negative." },
+      { t: "One result per patient", how: "Several lesions or vessels per patient are not independent.", fail: "Analyse per patient, or use methods that account for clustering." }
+    ],
+    pitfalls: [
+      "Predictive values do not transfer between settings: PPV falls when the disease is rarer. Quote sensitivity, specificity and likelihood ratios for use elsewhere.",
+      "Confusing sensitivity (probability of a positive test if diseased) with PPV (probability of disease if the test is positive).",
+      "Reporting overall accuracy (% correct) alone hides poor sensitivity or specificity.",
+      "Leaving out 95% confidence intervals. Use Wilson or exact (Clopper–Pearson) intervals for proportions.",
+      "Using McNemar’s or the chi-squared test to describe accuracy. They answer different questions.",
+      "Not following the STARD reporting guideline for diagnostic accuracy studies."
+    ],
+    interpret: [
+      "Sensitivity = TP ÷ (TP + FN): the proportion of patients with the condition who test positive. A highly sensitive test, when negative, helps rule out (SnNout).",
+      "Specificity = TN ÷ (TN + FP): the proportion without the condition who test negative. A highly specific test, when positive, helps rule in (SpPin).",
+      "PPV and NPV: the probability of disease after a positive or negative result, valid only at the prevalence in your study.",
+      "Likelihood ratios: LR+ above 10 or LR− below 0.1 change the probability of disease substantially.",
+      "Report each measure with its 95% CI, alongside the full 2×2 table."
+    ],
+    report: "Of 212 patients, 64 had an aneurysm on DSA. CT angiography had a sensitivity of 92% (59/64; 95% CI 83 to 97) and a specificity of 96% (142/148; 95% CI 91 to 98); LR+ 22.7 and LR− 0.08.",
+    software: [
+      ["R", "# rows: test +/−, columns: disease +/−\nepiR::epi.tests(as.table(matrix(c(59, 5, 6, 142), nrow = 2)))"],
+      ["Stata", "diagt reference index   // ssc install diagt"],
+      ["SPSS", "Analyze › Descriptive Statistics › Crosstabs (index × reference), then calculate the proportions with CIs"]
+    ],
+    related: ["roc", "post-test", "mcnemar"]
+  },
+
+  "roc": {
+    name: "ROC curve analysis (AUC and cut-off)",
+    family: "diagnostic",
+    short: "Assesses how well a continuous marker or score separates patients with and without a condition.",
+    useWhen: "A continuous or ordinal marker (lab value, score, imaging measurement) and a yes/no reference standard; you want the overall discrimination and a cut-off.",
+    example: "Serum S100B to predict intracranial injury on CT after mild traumatic brain injury.",
+    why: "A ROC curve plots sensitivity against 1 − specificity at every possible cut-off. The area under the curve (AUC) summarises discrimination in one number: the probability that a randomly chosen patient with the condition has a higher marker value than one without. The curve also shows the trade-off at each candidate cut-off.",
+    assumptions: [
+      { t: "The reference standard is binary and applied to all patients", how: "Each patient is classified as having or not having the condition by the reference standard.", fail: "See the diagnostic accuracy checklist for verification bias.", alt: "diag-accuracy" },
+      { t: "The marker was measured blind to the outcome", how: "The marker should be measured before, or without knowledge of, the reference result.", fail: "Report the risk of bias." },
+      { t: "Patients are representative of clinical use", how: "Consecutive patients with suspected disease, not extreme cases vs healthy controls.", fail: "AUC will be overestimated; state the limitation." },
+      { t: "Observations are independent", how: "One marker value per patient.", fail: "Use clustered ROC methods for repeated measurements." },
+      { t: "Enough patients with and without the condition", how: "Small numbers of events give wide CIs for the AUC and unstable cut-offs.", fail: "Report the CI and treat the cut-off as provisional." },
+      { t: "The cut-off reflects clinical consequences", how: "The Youden index assumes false positives and false negatives matter equally. For rule-out tests, high sensitivity is usually preferred.", fail: "Choose the cut-off for a target sensitivity or specificity, justified clinically." }
+    ],
+    pitfalls: [
+      "An “optimal” cut-off chosen from the same data is over-optimistic. Validate it in a separate sample.",
+      "Comparing the AUCs of two markers measured on the same patients needs a paired test (DeLong), not two separate CIs.",
+      "A statistically significant AUC (vs 0.5) can still be clinically useless.",
+      "AUC measures discrimination, not calibration; a prediction model also needs a calibration check.",
+      "Reporting the cut-off without its sensitivity and specificity (and their CIs)."
+    ],
+    interpret: [
+      "AUC: 0.5 is no better than chance; 0.7–0.8 acceptable; 0.8–0.9 excellent; above 0.9 outstanding. Report it with a 95% CI.",
+      "For the chosen cut-off, report sensitivity, specificity and likelihood ratios with 95% CIs.",
+      "Show the ROC curve with the chosen cut-off marked."
+    ],
+    report: "S100B discriminated patients with and without CT-detected injury with an AUC of 0.78 (95% CI 0.71 to 0.85). At the pre-specified cut-off of 0.10 µg/L, sensitivity was 97% (95% CI 89 to 100) and specificity 33% (95% CI 28 to 38).",
+    software: [
+      ["R", "r <- pROC::roc(injury ~ s100b, data = d, ci = TRUE); r\npROC::coords(r, \"best\", best.method = \"youden\")"],
+      ["Stata", "roctab injury s100b, detail"],
+      ["SPSS", "Analyze › Classify › ROC Curve; tick Standard error and confidence interval"]
+    ],
+    related: ["diag-accuracy", "post-test", "logistic"]
+  },
+
+  "post-test": {
+    name: "Post-test probability (likelihood ratios and Fagan nomogram)",
+    family: "diagnostic",
+    short: "Works out what a test result means for an individual patient.",
+    useWhen: "You know a test’s sensitivity and specificity (or likelihood ratios) and have an estimate of the patient’s pre-test probability.",
+    example: "A patient with a 20% clinical probability of pulmonary embolism has a negative D-dimer (sensitivity 95%, specificity 40%).",
+    why: "Bayes’ theorem links the two: post-test odds = pre-test odds × likelihood ratio. This turns published test accuracy into the probability of disease for the patient in front of you, which is what clinical decisions depend on.",
+    assumptions: [
+      { t: "Sensitivity and specificity come from patients like yours", how: "Check the source study’s setting and spectrum (e.g. emergency department vs specialist clinic).", fail: "Use accuracy figures from a more similar population, or treat the result as approximate." },
+      { t: "The pre-test probability is well founded", how: "Base it on a validated clinical prediction rule or local prevalence, not a guess.", fail: "Show the post-test probability across a plausible range of pre-test probabilities." },
+      { t: "The test is performed and read as in the source study", how: "Same assay, threshold and interpretation.", fail: "Accuracy may differ; interpret cautiously." },
+      { t: "Tests are conditionally independent when likelihood ratios are chained", how: "Multiplying LRs from several tests assumes they give independent information, which correlated tests do not.", fail: "Do not chain LRs from related tests; use a validated combined model instead." }
+    ],
+    pitfalls: [
+      "Treating a negative test as absolute rule-out when the pre-test probability was high.",
+      "Using a PPV from a study with a different prevalence instead of recalculating.",
+      "Ignoring the uncertainty in published sensitivity and specificity.",
+      "Chaining likelihood ratios from correlated tests, which overstates certainty."
+    ],
+    interpret: [
+      "Convert: pre-test odds = p ÷ (1 − p); post-test odds = pre-test odds × LR; post-test probability = odds ÷ (1 + odds).",
+      "LR+ above 10 or LR− below 0.1: large change. 5–10 or 0.1–0.2: moderate. 2–5 or 0.2–0.5: small.",
+      "Compare the post-test probability with your thresholds for further testing and for treatment."
+    ],
+    report: "With a pre-test probability of 20% and a negative D-dimer (LR− = 0.05 ÷ 0.40 = 0.13), the post-test probability of pulmonary embolism was 3.0%.",
+    software: [
+      ["R", "pre <- 0.20; lr <- (1 - 0.95) / 0.40\nodds <- pre / (1 - pre) * lr; odds / (1 + odds)   # 0.030"],
+      ["Online", "Fagan nomogram calculators (e.g. the CEBM or MDCalc diagnostic tools)"],
+      ["Spreadsheet", "=LET(o, p/(1-p)*LR, o/(1+o))"]
+    ],
+    related: ["diag-accuracy", "roc", "bayes-groups"]
   },
 
   // =================== BAYESIAN ===================

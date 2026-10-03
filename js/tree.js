@@ -13,7 +13,19 @@ window.TREE = {
       { label: "Analyse the time until an event", sub: "e.g. death, relapse, readmission, time to discharge", next: "surv_groups" },
       { label: "Explain or predict a yes/no outcome from several factors", sub: "e.g. risk factors for post-operative delirium", next: "bin_measure" },
       { label: "Model counts or rates", sub: "e.g. asthma attacks per patient-year; number of falls", result: "poisson-count" },
+      { label: "Assess how accurate a diagnostic test is", sub: "e.g. sensitivity of CT angiography; choosing a cut-off for a biomarker", next: "diag_goal" },
       { label: "Explore many variables to find patterns", sub: "e.g. which lab values cluster together in sepsis", next: "explore_types" }
+    ]
+  },
+
+  // ---------- Diagnostic accuracy ----------
+  diag_goal: {
+    q: "What do you want to know about the test?",
+    help: "A reference standard is the best available way of confirming the diagnosis, such as angiography, histology or follow-up.",
+    options: [
+      { label: "How accurate a positive/negative test is against a reference standard", sub: "sensitivity, specificity, predictive values, likelihood ratios", result: "diag-accuracy" },
+      { label: "How well a numeric marker or score discriminates, and where to set the cut-off", sub: "ROC curve and area under the curve", result: "roc" },
+      { label: "What a test result means for an individual patient", sub: "post-test probability from the pre-test probability", result: "post-test" }
     ]
   },
 
